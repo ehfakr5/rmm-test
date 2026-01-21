@@ -116,6 +116,9 @@ jobs:
         run: |
           VERSION="v${{ steps.version.outputs.version }}"
 
+          # Delete existing release if it exists to avoid conflicts
+          gh release delete "$VERSION" --yes || true
+
           # Create release with gh CLI
           gh release create "$VERSION" \
             --title "Release $VERSION" \
