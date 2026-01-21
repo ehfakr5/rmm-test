@@ -109,14 +109,18 @@ jobs:
           git push origin "v${{ github.event.inputs.version }}"
 
       - name: Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}
-          name: Release v${{ steps.version.outputs.version }}
-          draft: false
-          prerelease: false
-          files: |
-            artifacts/**/*.zip
-            artifacts/**/*.dmg
+        run: |
+          VERSION="v${{ steps.version.outputs.version }}"
+
+          # Collect all release files
+          FILES=$(find artifacts -type f \( -name "*.zip" -o -name "*.dmg" \) | tr '\n' ' ')
+
+          echo "Creating release $VERSION with files: $FILES"
+
+          # Create release with gh CLI
+          gh release create "$VERSION" \
+            --title "Release $VERSION" \
+            --generate-notes \
+            $FILES
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
