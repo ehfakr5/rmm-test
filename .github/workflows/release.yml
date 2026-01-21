@@ -104,6 +104,13 @@ jobs:
         run: |
           find artifacts -depth -name "* *" -exec bash -c 'mv "$1" "${1// /_}"' _ {} \;
 
+      - name: Flatten artifacts and Remove Duplicates
+        run: |
+          mkdir -p artifacts_final
+          find artifacts -type f -exec cp -f {} artifacts_final/ \;
+          echo "Final artifacts list:"
+          ls -lh artifacts_final/
+
       - name: Create and push tag (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         run: |
@@ -123,6 +130,6 @@ jobs:
           gh release create "$VERSION" \
             --title "Release $VERSION" \
             --generate-notes \
-            artifacts/*/*.zip artifacts/*/*.dmg
+            artifacts_final/*
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
