@@ -100,6 +100,10 @@ jobs:
       - name: List artifacts
         run: find artifacts -type f
 
+      - name: Rename artifacts (replace spaces with underscores)
+        run: |
+          find artifacts -depth -name "* *" -exec bash -c 'mv "$1" "${1// /_}"' _ {} \;
+
       - name: Create and push tag (manual trigger only)
         if: github.event_name == 'workflow_dispatch'
         run: |
